@@ -1,0 +1,24 @@
+{
+  "script": "02_hydrological_response",
+  "timestamp": "2026-04-30T04:20:11.210499",
+  "crosscorr": {
+    "lag_optimo_dias": 1,
+    "corr_maxima": 0.607
+  },
+  "cq_analysis": {
+    "no3": {
+      "slope_b": -0.01,
+      "r2": 0.001,
+      "p_value": 0.4774,
+      "behaviour": "QUIMIOSTÁTICO (fuente persistente, tipo acuífero)",
+      "n_samples": 699
+    },
+    "po4": {
+      "slope_b": 0.231,
+      "r2": 0.103,
+      "p_value": 0.0,
+      "behaviour": "MOVILIZACIÓN (concentración aumenta con caudal)",
+      "n_samples": 614
+    }
+  }
+}

@@ -1,0 +1,395 @@
+{
+  "pipeline_timestamp": "2026-04-30T04:21:07.745015",
+  "duration_sec": 67.9,
+  "errors": [],
+  "scripts": {
+    "01_source_apportionment": {
+      "script": "01_source_apportionment",
+      "timestamp": "2026-04-30T04:20:05.678118",
+      "totales_no3_top5": [
+        {
+          "pto": "2",
+          "nombre": "Desembocadura rambla Albujón",
+          "total_tonnes": 1660.19,
+          "pct": 79.83
+        },
+        {
+          "pto": "10",
+          "nombre": "Obra de paso bajo carretera Lo",
+          "total_tonnes": 237.3,
+          "pct": 11.41
+        },
+        {
+          "pto": "15B",
+          "nombre": "Rambla de las Matildes - corri",
+          "total_tonnes": 74.22,
+          "pct": 3.57
+        },
+        {
+          "pto": "12",
+          "nombre": "Desembocadura rambla de Mirand",
+          "total_tonnes": 40.36,
+          "pct": 1.94
+        },
+        {
+          "pto": "19",
+          "nombre": "Freáticos Los Alcázares",
+          "total_tonnes": 36.73,
+          "pct": 1.77
+        }
+      ],
+      "totales_po4_top5": [
+        {
+          "pto": "2",
+          "nombre": "Desembocadura rambla Albujón",
+          "total_tonnes": 11.09,
+          "pct": 96.45
+        },
+        {
+          "pto": "10",
+          "nombre": "Obra de paso bajo carretera Lo",
+          "total_tonnes": 0.203,
+          "pct": 1.77
+        },
+        {
+          "pto": "19",
+          "nombre": "Freático Los Alcázares",
+          "total_tonnes": 0.072,
+          "pct": 0.62
+        },
+        {
+          "pto": "20",
+          "nombre": "Venta Simón",
+          "total_tonnes": 0.048,
+          "pct": 0.41
+        },
+        {
+          "pto": "12",
+          "nombre": "Desembocadura rambla de Mirand",
+          "total_tonnes": 0.039,
+          "pct": 0.34
+        }
+      ],
+      "ratio_np_summary": [
+        {
+          "pto": "2",
+          "nombre": "Desembocadura rambla Albujón",
+          "mediana": 343.9,
+          "pct_P_limitante": 99.8
+        },
+        {
+          "pto": "2B",
+          "nombre": "Aguas arriba Barrio de la Fuen",
+          "mediana": 961.6,
+          "pct_P_limitante": 100.0
+        },
+        {
+          "pto": "2C",
+          "nombre": "Badén aguas abajo La Puebla",
+          "mediana": 416.2,
+          "pct_P_limitante": 100.0
+        },
+        {
+          "pto": "2D",
+          "nombre": "Pasaje la balsa",
+          "mediana": 197.3,
+          "pct_P_limitante": 88.9
+        },
+        {
+          "pto": "2E",
+          "nombre": "EDAR Torre-Pacheco",
+          "mediana": 2913.8,
+          "pct_P_limitante": 100.0
+        },
+        {
+          "pto": "4",
+          "nombre": "Canal D-7",
+          "mediana": 1094.9,
+          "pct_P_limitante": 97.6
+        },
+        {
+          "pto": "6",
+          "nombre": "Tramo Medio Rambla Albujón",
+          "mediana": 114.3,
+          "pct_P_limitante": 100.0
+        },
+        {
+          "pto": "8",
+          "nombre": "Aliviadero",
+          "mediana": 2981.1,
+          "pct_P_limitante": 100.0
+        },
+        {
+          "pto": "10",
+          "nombre": "Obra de paso bajo carretera Lo",
+          "mediana": 2999.6,
+          "pct_P_limitante": 100.0
+        },
+        {
+          "pto": "12",
+          "nombre": "Desembocadura rambla de Mirand",
+          "mediana": 2977.0,
+          "pct_P_limitante": 97.9
+        },
+        {
+          "pto": "15B",
+          "nombre": "Rambla de las Matildes - corri",
+          "mediana": 2753.9,
+          "pct_P_limitante": 100.0
+        },
+        {
+          "pto": "16",
+          "nombre": "Lo Poyo",
+          "mediana": 512.4,
+          "pct_P_limitante": 100.0
+        },
+        {
+          "pto": "19",
+          "nombre": "Freáticos Los Alcázares",
+          "mediana": 699.9,
+          "pct_P_limitante": 100.0
+        },
+        {
+          "pto": "20",
+          "nombre": "Venta Simón",
+          "mediana": 674.0,
+          "pct_P_limitante": 100.0
+        }
+      ]
+    },
+    "02_hydrological_response": {
+      "script": "02_hydrological_response",
+      "timestamp": "2026-04-30T04:20:11.210499",
+      "crosscorr": {
+        "lag_optimo_dias": 1,
+        "corr_maxima": 0.607
+      },
+      "cq_analysis": {
+        "no3": {
+          "slope_b": -0.01,
+          "r2": 0.001,
+          "p_value": 0.4774,
+          "behaviour": "QUIMIOSTÁTICO (fuente persistente, tipo acuífero)",
+          "n_samples": 699
+        },
+        "po4": {
+          "slope_b": 0.231,
+          "r2": 0.103,
+          "p_value": 0.0,
+          "behaviour": "MOVILIZACIÓN (concentración aumenta con caudal)",
+          "n_samples": 614
+        }
+      }
+    },
+    "03_lstm_gru_forecast": {
+      "script": "03_lstm_gru_forecast",
+      "timestamp": "2026-04-30T04:20:58.908495",
+      "metrics": [
+        {
+          "Modelo": "LSTM-U-NO3",
+          "MAE": 17.165041995217614,
+          "RMSE": 20.374572246080156,
+          "MAPE (%)": 17.741459912099714,
+          "CVRMSE (%)": 19.210433594664476
+        },
+        {
+          "Modelo": "GRU-U-NO3",
+          "MAE": 24.085969781537425,
+          "RMSE": 29.310093903509998,
+          "MAPE (%)": 27.025944797132105,
+          "CVRMSE (%)": 27.635407790957935
+        },
+        {
+          "Modelo": "LSTM-MV-NO3",
+          "MAE": 29.775325982876076,
+          "RMSE": 35.25028114675306,
+          "MAPE (%)": 33.29191351873654,
+          "CVRMSE (%)": 33.23619151284187
+        },
+        {
+          "Modelo": "GRU-MV-NO3",
+          "MAE": 22.345129098418138,
+          "RMSE": 27.52126623230582,
+          "MAPE (%)": 25.093389081050415,
+          "CVRMSE (%)": 25.948788078164824
+        },
+        {
+          "Modelo": "LSTM-U-PO4",
+          "MAE": 0.2517336278408766,
+          "RMSE": 0.33938395244843916,
+          "MAPE (%)": 25.61949673839714,
+          "CVRMSE (%)": 41.15563624714224
+        },
+        {
+          "Modelo": "GRU-U-PO4",
+          "MAE": 0.22339893658955892,
+          "RMSE": 0.3122896856930524,
+          "MAPE (%)": 22.536288795172332,
+          "CVRMSE (%)": 37.87003072889917
+        },
+        {
+          "Modelo": "LSTM-MV-PO4",
+          "MAE": 0.26693642388717903,
+          "RMSE": 0.35372457994660145,
+          "MAPE (%)": 27.32419016309005,
+          "CVRMSE (%)": 42.89466263484335
+        },
+        {
+          "Modelo": "GRU-MV-PO4",
+          "MAE": 0.24616990625811386,
+          "RMSE": 0.33509515067058987,
+          "MAPE (%)": 24.979992868270365,
+          "CVRMSE (%)": 40.63555165082628
+        }
+      ]
+    },
+    "04_gradient_boosting_benchmark": {
+      "script": "04_gradient_boosting_benchmark",
+      "timestamp": "2026-04-30T04:21:07.495753",
+      "metrics": [
+        {
+          "Modelo": "LGBM-NO3",
+          "MAE": 19.12751217606188,
+          "RMSE": 23.568362277522898,
+          "MAPE (%)": 20.497541212510754,
+          "CVRMSE (%)": 22.221740559704493
+        },
+        {
+          "Modelo": "XGB-NO3",
+          "MAE": 21.690362602937302,
+          "RMSE": 25.963775233052115,
+          "MAPE (%)": 23.951346510024603,
+          "CVRMSE (%)": 24.48028719117285
+        },
+        {
+          "Modelo": "LGBM-PO4",
+          "MAE": 0.2164554804384008,
+          "RMSE": 0.2954443048811003,
+          "MAPE (%)": 24.656960760059864,
+          "CVRMSE (%)": 35.827263650079736
+        },
+        {
+          "Modelo": "XGB-PO4",
+          "MAE": 0.2378570406263073,
+          "RMSE": 0.3094064483685737,
+          "MAPE (%)": 27.48123744614132,
+          "CVRMSE (%)": 37.52039290517663
+        },
+        {
+          "Modelo": "LGBM-U-NO3",
+          "MAE": 19.563645457360185,
+          "RMSE": 23.370404016659933,
+          "MAPE (%)": 20.861209962329237,
+          "CVRMSE (%)": 22.03509300809492
+        },
+        {
+          "Modelo": "XGB-U-NO3",
+          "MAE": 18.029206274587207,
+          "RMSE": 22.51899190355136,
+          "MAPE (%)": 19.33464915672592,
+          "CVRMSE (%)": 21.23232789170275
+        },
+        {
+          "Modelo": "LGBM-U-PO4",
+          "MAE": 0.24059377052975583,
+          "RMSE": 0.32338927192205513,
+          "MAPE (%)": 28.992020145896387,
+          "CVRMSE (%)": 39.21602994317854
+        },
+        {
+          "Modelo": "XGB-U-PO4",
+          "MAE": 0.23966798966129618,
+          "RMSE": 0.3149570203372184,
+          "MAPE (%)": 28.40356942406602,
+          "CVRMSE (%)": 38.19348696061765
+        }
+      ],
+      "feature_importance": {
+        "no3_top10": [
+          {
+            "Feature": "precip_roll_mean",
+            "Importance": 314
+          },
+          {
+            "Feature": "NO3_lag1",
+            "Importance": 269
+          },
+          {
+            "Feature": "precip",
+            "Importance": 263
+          },
+          {
+            "Feature": "NO3_lag3",
+            "Importance": 233
+          },
+          {
+            "Feature": "precip_lag1",
+            "Importance": 233
+          },
+          {
+            "Feature": "NO3_lag5",
+            "Importance": 231
+          },
+          {
+            "Feature": "NO3_lag7",
+            "Importance": 219
+          },
+          {
+            "Feature": "NO3_lag6",
+            "Importance": 208
+          },
+          {
+            "Feature": "precip_roll_max",
+            "Importance": 205
+          },
+          {
+            "Feature": "NO3_lag2",
+            "Importance": 193
+          }
+        ],
+        "po4_top10": [
+          {
+            "Feature": "PO4_lag1",
+            "Importance": 256
+          },
+          {
+            "Feature": "caudal_lag2",
+            "Importance": 180
+          },
+          {
+            "Feature": "PO4_lag2",
+            "Importance": 178
+          },
+          {
+            "Feature": "precip",
+            "Importance": 162
+          },
+          {
+            "Feature": "PO4_lag6",
+            "Importance": 143
+          },
+          {
+            "Feature": "precip_lag2",
+            "Importance": 138
+          },
+          {
+            "Feature": "caudal_lag1",
+            "Importance": 135
+          },
+          {
+            "Feature": "week_sin",
+            "Importance": 132
+          },
+          {
+            "Feature": "PO4_lag5",
+            "Importance": 130
+          },
+          {
+            "Feature": "PO4_lag8",
+            "Importance": 128
+          }
+        ]
+      }
+    }
+  }
+}

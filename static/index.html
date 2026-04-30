@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spatio-Temporal Characterization of Nutrient Loading in an Ephemeral Mediterranean Catchment</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js" defer></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">NEREIDAS+ <span class="tag">AI Dashboard</span></div>
+        <div class="nav-meta">
+            <span id="last-update">—</span>
+            <button id="btn-refresh" class="btn primary">Update now</button>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section class="hero">
+            <h1>Spatio-Temporal Characterization of Nutrient Loading in an Ephemeral Mediterranean Catchment Using Multi-Source Monitoring and Recurrent Neural Network Forecasting</h1>
+            <p class="subtitle">Real-time results for the <em>AI4Nature@AVSS2026</em> paper. Data are automatically updated from the <a href="https://canalmarmenor.carm.es/" target="_blank">Canal Mar Menor</a>.</p>
+        </section>
+
+        <section id="status-banner" class="status-banner">
+            Loading status...
+        </section>
+
+        <section id="filter-bar" class="filter-bar">
+            <label>Date range:
+                <input type="date" id="date-start">
+                <input type="date" id="date-end">
+            </label>
+            <button id="btn-apply-range" class="btn primary">Apply range</button>
+            <button id="btn-reset-range" class="btn">Reset</button>
+        </section>
+
+        <div class="grid">
+            <div class="card wide">
+                <h2>Latest Records</h2>
+                <div id="latest-records" class="loading">Loading...</div>
+            </div>
+
+            <div class="card wide">
+                <h2>Nutrient Loading</h2>
+                <div class="metric-row" id="sec01-load-metrics"></div>
+                <div class="plotly-scroll-container">
+                    <div id="plot-load-ranking" class="plotly-chart"></div>
+                </div>
+            </div>
+
+            <div class="card wide">
+                <h2>N:P Ratio vs. Redfield</h2>
+                <div class="metric-row" id="sec01-np-metrics"></div>
+                <div id="plot-np-box" class="plotly-chart"></div>
+                <div id="plot-np-temporal" class="plotly-chart" style="margin-top:16px"></div>
+            </div>
+
+            <div class="card wide">
+                <h2>Hydrological Response</h2>
+                <div class="metric-row" id="sec02-metrics"></div>
+                <div id="plot-crosscorr" class="plotly-chart"></div>
+                <div id="plot-cq" class="plotly-chart" style="margin-top:16px"></div>
+            </div>
+
+            <div class="card wide">
+                <h2>Forecasting — Test Metrics</h2>
+                <div id="forecast-metrics" class="loading">Loading...</div>
+                <div style="margin-top:12px; text-align:right;">
+                    <button id="btn-download-metrics" class="btn primary">Download metrics (JSON)</button>
+                </div>
+            </div>
+
+            <div class="card wide">
+                <h2>Generated Figures</h2>
+                <div id="figure-selector" class="figure-selector"></div>
+                <div style="margin-bottom:12px; text-align:right;">
+                    <button id="btn-download-figures" class="btn primary">Download all figures (ZIP)</button>
+                </div>
+                <div id="figures" class="loading">Loading...</div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>NEREIDAS+ / OMM-Azul — Universidad Politécnica de Cartagena &amp; IMIDA</p>
+    </footer>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

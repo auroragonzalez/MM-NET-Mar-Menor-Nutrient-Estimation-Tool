@@ -1,0 +1,154 @@
+{
+  "script": "01_source_apportionment",
+  "timestamp": "2026-04-30T04:20:05.678118",
+  "totales_no3_top5": [
+    {
+      "pto": "2",
+      "nombre": "Desembocadura rambla Albujón",
+      "total_tonnes": 1660.19,
+      "pct": 79.83
+    },
+    {
+      "pto": "10",
+      "nombre": "Obra de paso bajo carretera Lo",
+      "total_tonnes": 237.3,
+      "pct": 11.41
+    },
+    {
+      "pto": "15B",
+      "nombre": "Rambla de las Matildes - corri",
+      "total_tonnes": 74.22,
+      "pct": 3.57
+    },
+    {
+      "pto": "12",
+      "nombre": "Desembocadura rambla de Mirand",
+      "total_tonnes": 40.36,
+      "pct": 1.94
+    },
+    {
+      "pto": "19",
+      "nombre": "Freáticos Los Alcázares",
+      "total_tonnes": 36.73,
+      "pct": 1.77
+    }
+  ],
+  "totales_po4_top5": [
+    {
+      "pto": "2",
+      "nombre": "Desembocadura rambla Albujón",
+      "total_tonnes": 11.09,
+      "pct": 96.45
+    },
+    {
+      "pto": "10",
+      "nombre": "Obra de paso bajo carretera Lo",
+      "total_tonnes": 0.203,
+      "pct": 1.77
+    },
+    {
+      "pto": "19",
+      "nombre": "Freático Los Alcázares",
+      "total_tonnes": 0.072,
+      "pct": 0.62
+    },
+    {
+      "pto": "20",
+      "nombre": "Venta Simón",
+      "total_tonnes": 0.048,
+      "pct": 0.41
+    },
+    {
+      "pto": "12",
+      "nombre": "Desembocadura rambla de Mirand",
+      "total_tonnes": 0.039,
+      "pct": 0.34
+    }
+  ],
+  "ratio_np_summary": [
+    {
+      "pto": "2",
+      "nombre": "Desembocadura rambla Albujón",
+      "mediana": 343.9,
+      "pct_P_limitante": 99.8
+    },
+    {
+      "pto": "2B",
+      "nombre": "Aguas arriba Barrio de la Fuen",
+      "mediana": 961.6,
+      "pct_P_limitante": 100.0
+    },
+    {
+      "pto": "2C",
+      "nombre": "Badén aguas abajo La Puebla",
+      "mediana": 416.2,
+      "pct_P_limitante": 100.0
+    },
+    {
+      "pto": "2D",
+      "nombre": "Pasaje la balsa",
+      "mediana": 197.3,
+      "pct_P_limitante": 88.9
+    },
+    {
+      "pto": "2E",
+      "nombre": "EDAR Torre-Pacheco",
+      "mediana": 2913.8,
+      "pct_P_limitante": 100.0
+    },
+    {
+      "pto": "4",
+      "nombre": "Canal D-7",
+      "mediana": 1094.9,
+      "pct_P_limitante": 97.6
+    },
+    {
+      "pto": "6",
+      "nombre": "Tramo Medio Rambla Albujón",
+      "mediana": 114.3,
+      "pct_P_limitante": 100.0
+    },
+    {
+      "pto": "8",
+      "nombre": "Aliviadero",
+      "mediana": 2981.1,
+      "pct_P_limitante": 100.0
+    },
+    {
+      "pto": "10",
+      "nombre": "Obra de paso bajo carretera Lo",
+      "mediana": 2999.6,
+      "pct_P_limitante": 100.0
+    },
+    {
+      "pto": "12",
+      "nombre": "Desembocadura rambla de Mirand",
+      "mediana": 2977.0,
+      "pct_P_limitante": 97.9
+    },
+    {
+      "pto": "15B",
+      "nombre": "Rambla de las Matildes - corri",
+      "mediana": 2753.9,
+      "pct_P_limitante": 100.0
+    },
+    {
+      "pto": "16",
+      "nombre": "Lo Poyo",
+      "mediana": 512.4,
+      "pct_P_limitante": 100.0
+    },
+    {
+      "pto": "19",
+      "nombre": "Freáticos Los Alcázares",
+      "mediana": 699.9,
+      "pct_P_limitante": 100.0
+    },
+    {
+      "pto": "20",
+      "nombre": "Venta Simón",
+      "mediana": 674.0,
+      "pct_P_limitante": 100.0
+    }
+  ]
+}
