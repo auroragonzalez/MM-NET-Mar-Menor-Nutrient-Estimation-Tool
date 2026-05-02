@@ -1,25 +1,34 @@
 #!/usr/bin/env bash
-# run_dev.sh — Launch the NEREIDAS+ web service locally for development.
-
+# run_dev.sh — Launch the NEREIDAS+ web service (self-contained deployment).
+# Everything (code, data, venv) lives inside the web_service/ directory.
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+cd "${SCRIPT_DIR}"
 
-cd "${REPO_ROOT}"
-
-# Use repository-local paths instead of container /data paths
-export NEREIDAS_DATA_DIR="${REPO_ROOT}/NEREIDAS+"
-export RESULTS_OUTPUT_DIR="${REPO_ROOT}/web_service/data"
-export SCRAPER_INTERVAL_HOURS="6"
+# ── Data directory (inside web_service/) ────────────────────────────────────
+export NEREIDAS_DATA_DIR="${NEREIDAS_DATA_DIR:-${SCRIPT_DIR}/data}"
+export RESULTS_OUTPUT_DIR="${RESULTS_OUTPUT_DIR:-${SCRIPT_DIR}/data}"
+export SCRAPER_INTERVAL_HOURS="${SCRAPER_INTERVAL_HOURS:-6}"
 
 mkdir -p "${RESULTS_OUTPUT_DIR}"
 
 echo "NEREIDAS_DATA_DIR=${NEREIDAS_DATA_DIR}"
 echo "RESULTS_OUTPUT_DIR=${RESULTS_OUTPUT_DIR}"
-echo "Activating venv ..."
-source .venv/bin/activate
 
-echo "Starting uvicorn ..."
-cd "${REPO_ROOT}/web_service"
-uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+# ── Python virtual environment ──────────────────────────────────────────────
+VENV_DIR="${SCRIPT_DIR}/.venv"
+if [ ! -f "${VENV_DIR}/bin/activate" ]; then
+    echo "Creating virtual environment at ${VENV_DIR} ..."
+    python3 -m venv "${VENV_DIR}"
+    echo "Installing dependencies ..."
+    "${VENV_DIR}/bin/pip" install -r requirements.txt --quiet
+    echo "Dependencies installed."
+fi
+
+echo "Activating venv ..."
+source "${VENV_DIR}/bin/activate"
+
+# ── Launch ──────────────────────────────────────────────────────────────────
+echo "Starting uvicorn on http://0.0.0.0:8000 ..."
+exec uvicorn main:app --host 0.0.0.0 --port 8000 --reload

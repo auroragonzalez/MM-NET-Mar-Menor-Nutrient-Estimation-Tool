@@ -1,11 +1,15 @@
 {
-  "pipeline_timestamp": "2026-04-30T04:21:07.745015",
-  "duration_sec": 67.9,
+  "pipeline_timestamp": "2026-05-02T12:00:50.990095",
+  "duration_sec": 131.7,
   "errors": [],
   "scripts": {
     "01_source_apportionment": {
       "script": "01_source_apportionment",
-      "timestamp": "2026-04-30T04:20:05.678118",
+      "timestamp": "2026-05-02T11:58:46.230453",
+      "loads": {
+        "no3_global_tonnes": 2079.8,
+        "po4_global_tonnes": 11.5
+      },
       "totales_no3_top5": [
         {
           "pto": "2",
@@ -159,237 +163,68 @@
     },
     "02_hydrological_response": {
       "script": "02_hydrological_response",
-      "timestamp": "2026-04-30T04:20:11.210499",
+      "timestamp": "2026-05-02T11:58:52.230525",
       "crosscorr": {
         "lag_optimo_dias": 1,
         "corr_maxima": 0.607
       },
       "cq_analysis": {
         "no3": {
-          "slope_b": -0.01,
-          "r2": 0.001,
-          "p_value": 0.4774,
-          "behaviour": "QUIMIOSTÁTICO (fuente persistente, tipo acuífero)",
-          "n_samples": 699
+          "slope_b": 0.019,
+          "r2": 0.003,
+          "p_value": 0.3668,
+          "behaviour": "Chemostatic (b ≈ 0)",
+          "n_samples": 282
         },
         "po4": {
-          "slope_b": 0.231,
-          "r2": 0.103,
-          "p_value": 0.0,
-          "behaviour": "MOVILIZACIÓN (concentración aumenta con caudal)",
-          "n_samples": 614
+          "slope_b": 0.165,
+          "r2": 0.076,
+          "p_value": 0.0001,
+          "behaviour": "Mobilization (b > 0)",
+          "n_samples": 203
         }
       }
     },
     "03_lstm_gru_forecast": {
       "script": "03_lstm_gru_forecast",
-      "timestamp": "2026-04-30T04:20:58.908495",
+      "timestamp": "2026-05-02T12:00:49.160918",
+      "config": {
+        "lookback": 8,
+        "epochs": 250,
+        "batch": 16,
+        "patience": 30,
+        "n_seeds": 3
+      },
       "metrics": [
         {
-          "Modelo": "LSTM-U-NO3",
-          "MAE": 17.165041995217614,
-          "RMSE": 20.374572246080156,
-          "MAPE (%)": 17.741459912099714,
-          "CVRMSE (%)": 19.210433594664476
+          "Model": "GRU-NO3-uni",
+          "MAE": 13.629,
+          "RMSE": 16.814,
+          "MAPE": 13.5,
+          "CVRMSE": 15.9
         },
         {
-          "Modelo": "GRU-U-NO3",
-          "MAE": 24.085969781537425,
-          "RMSE": 29.310093903509998,
-          "MAPE (%)": 27.025944797132105,
-          "CVRMSE (%)": 27.635407790957935
+          "Model": "GRU-NO3-mv",
+          "MAE": 14.938,
+          "RMSE": 16.88,
+          "MAPE": 15.0,
+          "CVRMSE": 16.0
         },
         {
-          "Modelo": "LSTM-MV-NO3",
-          "MAE": 29.775325982876076,
-          "RMSE": 35.25028114675306,
-          "MAPE (%)": 33.29191351873654,
-          "CVRMSE (%)": 33.23619151284187
+          "Model": "LSTM-PO4-uni",
+          "MAE": 0.221,
+          "RMSE": 0.28,
+          "MAPE": 25.7,
+          "CVRMSE": 33.9
         },
         {
-          "Modelo": "GRU-MV-NO3",
-          "MAE": 22.345129098418138,
-          "RMSE": 27.52126623230582,
-          "MAPE (%)": 25.093389081050415,
-          "CVRMSE (%)": 25.948788078164824
-        },
-        {
-          "Modelo": "LSTM-U-PO4",
-          "MAE": 0.2517336278408766,
-          "RMSE": 0.33938395244843916,
-          "MAPE (%)": 25.61949673839714,
-          "CVRMSE (%)": 41.15563624714224
-        },
-        {
-          "Modelo": "GRU-U-PO4",
-          "MAE": 0.22339893658955892,
-          "RMSE": 0.3122896856930524,
-          "MAPE (%)": 22.536288795172332,
-          "CVRMSE (%)": 37.87003072889917
-        },
-        {
-          "Modelo": "LSTM-MV-PO4",
-          "MAE": 0.26693642388717903,
-          "RMSE": 0.35372457994660145,
-          "MAPE (%)": 27.32419016309005,
-          "CVRMSE (%)": 42.89466263484335
-        },
-        {
-          "Modelo": "GRU-MV-PO4",
-          "MAE": 0.24616990625811386,
-          "RMSE": 0.33509515067058987,
-          "MAPE (%)": 24.979992868270365,
-          "CVRMSE (%)": 40.63555165082628
+          "Model": "LSTM-PO4-mv",
+          "MAE": 0.095,
+          "RMSE": 0.105,
+          "MAPE": 18.3,
+          "CVRMSE": 20.0
         }
       ]
-    },
-    "04_gradient_boosting_benchmark": {
-      "script": "04_gradient_boosting_benchmark",
-      "timestamp": "2026-04-30T04:21:07.495753",
-      "metrics": [
-        {
-          "Modelo": "LGBM-NO3",
-          "MAE": 19.12751217606188,
-          "RMSE": 23.568362277522898,
-          "MAPE (%)": 20.497541212510754,
-          "CVRMSE (%)": 22.221740559704493
-        },
-        {
-          "Modelo": "XGB-NO3",
-          "MAE": 21.690362602937302,
-          "RMSE": 25.963775233052115,
-          "MAPE (%)": 23.951346510024603,
-          "CVRMSE (%)": 24.48028719117285
-        },
-        {
-          "Modelo": "LGBM-PO4",
-          "MAE": 0.2164554804384008,
-          "RMSE": 0.2954443048811003,
-          "MAPE (%)": 24.656960760059864,
-          "CVRMSE (%)": 35.827263650079736
-        },
-        {
-          "Modelo": "XGB-PO4",
-          "MAE": 0.2378570406263073,
-          "RMSE": 0.3094064483685737,
-          "MAPE (%)": 27.48123744614132,
-          "CVRMSE (%)": 37.52039290517663
-        },
-        {
-          "Modelo": "LGBM-U-NO3",
-          "MAE": 19.563645457360185,
-          "RMSE": 23.370404016659933,
-          "MAPE (%)": 20.861209962329237,
-          "CVRMSE (%)": 22.03509300809492
-        },
-        {
-          "Modelo": "XGB-U-NO3",
-          "MAE": 18.029206274587207,
-          "RMSE": 22.51899190355136,
-          "MAPE (%)": 19.33464915672592,
-          "CVRMSE (%)": 21.23232789170275
-        },
-        {
-          "Modelo": "LGBM-U-PO4",
-          "MAE": 0.24059377052975583,
-          "RMSE": 0.32338927192205513,
-          "MAPE (%)": 28.992020145896387,
-          "CVRMSE (%)": 39.21602994317854
-        },
-        {
-          "Modelo": "XGB-U-PO4",
-          "MAE": 0.23966798966129618,
-          "RMSE": 0.3149570203372184,
-          "MAPE (%)": 28.40356942406602,
-          "CVRMSE (%)": 38.19348696061765
-        }
-      ],
-      "feature_importance": {
-        "no3_top10": [
-          {
-            "Feature": "precip_roll_mean",
-            "Importance": 314
-          },
-          {
-            "Feature": "NO3_lag1",
-            "Importance": 269
-          },
-          {
-            "Feature": "precip",
-            "Importance": 263
-          },
-          {
-            "Feature": "NO3_lag3",
-            "Importance": 233
-          },
-          {
-            "Feature": "precip_lag1",
-            "Importance": 233
-          },
-          {
-            "Feature": "NO3_lag5",
-            "Importance": 231
-          },
-          {
-            "Feature": "NO3_lag7",
-            "Importance": 219
-          },
-          {
-            "Feature": "NO3_lag6",
-            "Importance": 208
-          },
-          {
-            "Feature": "precip_roll_max",
-            "Importance": 205
-          },
-          {
-            "Feature": "NO3_lag2",
-            "Importance": 193
-          }
-        ],
-        "po4_top10": [
-          {
-            "Feature": "PO4_lag1",
-            "Importance": 256
-          },
-          {
-            "Feature": "caudal_lag2",
-            "Importance": 180
-          },
-          {
-            "Feature": "PO4_lag2",
-            "Importance": 178
-          },
-          {
-            "Feature": "precip",
-            "Importance": 162
-          },
-          {
-            "Feature": "PO4_lag6",
-            "Importance": 143
-          },
-          {
-            "Feature": "precip_lag2",
-            "Importance": 138
-          },
-          {
-            "Feature": "caudal_lag1",
-            "Importance": 135
-          },
-          {
-            "Feature": "week_sin",
-            "Importance": 132
-          },
-          {
-            "Feature": "PO4_lag5",
-            "Importance": 130
-          },
-          {
-            "Feature": "PO4_lag8",
-            "Importance": 128
-          }
-        ]
-      }
     }
   }
 }

@@ -20,8 +20,8 @@ MONITOR_URL = "https://canalmarmenor.carm.es/monitorizacion/monitorizacion-de-pa
 # Fallback direct URL if the scraper cannot locate the link automatically.
 FALLBACK_EXCEL_URL = os.environ.get("FALLBACK_EXCEL_URL", "")
 
-_repo_root = Path(__file__).resolve().parent.parent
-DATA_DIR = Path(os.environ.get("NEREIDAS_DATA_DIR", str(_repo_root / "NEREIDAS+")))
+_script_dir = Path(__file__).resolve().parent
+DATA_DIR = Path(os.environ.get("NEREIDAS_DATA_DIR", str(_script_dir / "data")))
 EXCEL_PATH = DATA_DIR / "26.03.06-Registro_Ramblas_MARMENOR.xlsx"
 META_PATH = DATA_DIR / "download_meta.json"
 

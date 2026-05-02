@@ -9,9 +9,9 @@ import os
 from pathlib import Path
 import pandas as pd
 
-_repo_root = Path(__file__).resolve().parent.parent
-DATA_DIR = Path(os.environ.get("NEREIDAS_DATA_DIR", str(_repo_root / "NEREIDAS+")))
-RESULTS_DIR = Path(os.environ.get("RESULTS_OUTPUT_DIR", str(_repo_root / "web_service" / "data")))
+_script_dir = Path(__file__).resolve().parent
+DATA_DIR = Path(os.environ.get("NEREIDAS_DATA_DIR", str(_script_dir / "data")))
+RESULTS_DIR = Path(os.environ.get("RESULTS_OUTPUT_DIR", str(_script_dir / "data")))
 CACHE_DIR = RESULTS_DIR / "cache"
 EXCEL_PATH = DATA_DIR / "26.03.06-Registro_Ramblas_MARMENOR.xlsx"
 

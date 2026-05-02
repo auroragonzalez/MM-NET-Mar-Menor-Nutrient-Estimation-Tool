@@ -34,21 +34,22 @@ from scraper import download_latest
 from pipeline import run_pipeline
 
 import sys
-_repo = Path(__file__).resolve().parent.parent
-if str(_repo) not in sys.path:
-    sys.path.insert(0, str(_repo))
-from web_service.data_store import (
+from pathlib import Path
+_script_dir = Path(__file__).resolve().parent
+if str(_script_dir) not in sys.path:
+    sys.path.insert(0, str(_script_dir))
+from data_store import (
     get_cached_df, get_available_date_range, build_cache,
     CACHE_DIR, invalidate_memory_cache,
 )
-from web_service.analysis_core import (
+from analysis_core import (
     compute_source_apportionment, compute_np_ratio,
     compute_crosscorr, compute_cq_analysis,
 )
 
-_repo_root = Path(__file__).resolve().parent.parent
-DATA_DIR = Path(os.environ.get("NEREIDAS_DATA_DIR", str(_repo_root / "NEREIDAS+")))
-RESULTS_DIR = Path(os.environ.get("RESULTS_OUTPUT_DIR", str(_repo_root / "web_service" / "data")))
+_script_dir = Path(__file__).resolve().parent
+DATA_DIR = Path(os.environ.get("NEREIDAS_DATA_DIR", str(_script_dir / "data")))
+RESULTS_DIR = Path(os.environ.get("RESULTS_OUTPUT_DIR", str(_script_dir / "data")))
 MASTER_JSON = RESULTS_DIR / "latest.json"
 SCRAPER_INTERVAL_HOURS = int(os.environ.get("SCRAPER_INTERVAL_HOURS", "6"))
 
@@ -132,16 +133,21 @@ def api_results():
 
 @app.get("/api/images/{image_name}")
 def api_image(image_name: str):
-    """Serve generated PNG figures."""
-    allowed_prefixes = (
-        "LineaA_fig", "LineaB_fig", "GB_fig", "A_wavelet"
-    )
-    if not any(image_name.startswith(p) for p in allowed_prefixes) or ".." in image_name:
+    """Serve generated figures (PNG or SVG)."""
+    if ".." in image_name:
         raise HTTPException(status_code=400, detail="Image name not allowed")
-    img_path = DATA_DIR / image_name
-    if not img_path.exists():
-        raise HTTPException(status_code=404, detail="Image not found")
-    return FileResponse(img_path, media_type="image/png")
+    # Search in multiple directories
+    search_dirs = [
+        _script_dir / "conf_paper_scripts",
+        RESULTS_DIR,
+    ]
+    for d in search_dirs:
+        img_path = d / image_name
+        if img_path.exists():
+            ext = img_path.suffix.lower()
+            media = "image/svg+xml" if ext == ".svg" else "image/png"
+            return FileResponse(img_path, media_type=media)
+    raise HTTPException(status_code=404, detail="Image not found")
 
 
 @app.post("/api/trigger-update")
@@ -156,12 +162,30 @@ def api_trigger(background_tasks: BackgroundTasks, force: bool = False):
     return {"message": "Update running in the background. Check /api/status in a few minutes."}
 
 
+@app.get("/api/map")
+def api_map():
+    """Serve the study area map figure."""
+    map_paths = [
+        _script_dir / "figs" / "map2.svg",
+        _script_dir / "figs" / "mapa_muestreo_mar_menor.png",
+    ]
+    for mp in map_paths:
+        if mp.exists():
+            media = "image/svg+xml" if mp.suffix == ".svg" else "image/png"
+            return FileResponse(mp, media_type=media)
+    raise HTTPException(status_code=404, detail="Map figure not found")
+
+
 @app.get("/api/figures")
 def api_figures():
-    """List available PNG figures in the data directory."""
-    if not DATA_DIR.exists():
-        return {"figures": []}
-    figures = sorted([f.name for f in DATA_DIR.glob("*.png") if f.stat().st_size > 0])
+    """List available figures in the results directory."""
+    results_figs = []
+    script_outputs = _script_dir / "conf_paper_scripts"
+    for d in [RESULTS_DIR, script_outputs]:
+        if d.exists():
+            for ext in ['*.svg', '*.png']:
+                results_figs.extend([f.name for f in d.glob(ext) if f.stat().st_size > 0])
+    figures = sorted(set(results_figs))
     return {"count": len(figures), "figures": figures}
 
 
@@ -329,14 +353,17 @@ def api_latest_records():
 # ---------------------------------------------------------------------------
 @app.get("/api/download/figures")
 def api_download_figures():
-    if not DATA_DIR.exists():
-        raise HTTPException(status_code=404, detail="Data directory not found.")
-    png_files = [f for f in DATA_DIR.glob("*.png") if f.stat().st_size > 0]
-    if not png_files:
+    results_figs = []
+    script_outputs = _script_dir / "conf_paper_scripts"
+    for d in [RESULTS_DIR, script_outputs]:
+        if d.exists():
+            for ext in ['*.svg', '*.png']:
+                results_figs.extend([f for f in d.glob(ext) if f.stat().st_size > 0])
+    if not results_figs:
         raise HTTPException(status_code=404, detail="No figures found.")
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
-        for f in png_files:
+        for f in results_figs:
             zf.write(f, f.name)
     buf.seek(0)
     return StreamingResponse(
@@ -353,18 +380,17 @@ def api_download_metrics():
     with open(MASTER_JSON, "r", encoding="utf-8") as f:
         data = json.load(f)
     rows = []
-    for script_key in ["03_lstm_gru_forecast", "04_gradient_boosting_benchmark"]:
+    for script_key in ["03_lstm_gru_forecast"]:
         script_data = data.get("scripts", {}).get(script_key, {})
         metrics = script_data.get("metrics", [])
-        family = "LSTM/GRU" if "lstm" in script_key else "Gradient Boosting"
         for m in metrics:
             rows.append({
-                "family": family,
-                "model": m.get("Modelo", ""),
+                "family": "LSTM/GRU",
+                "model": m.get("Model", m.get("Modelo", "")),
                 "MAE": m.get("MAE", ""),
                 "RMSE": m.get("RMSE", ""),
-                "MAPE_pct": m.get("MAPE (%)", ""),
-                "CVRMSE_pct": m.get("CVRMSE (%)", ""),
+                "MAPE_pct": m.get("MAPE", m.get("MAPE (%)", "")),
+                "CVRMSE_pct": m.get("CVRMSE", m.get("CVRMSE (%)", "")),
             })
     if not rows:
         raise HTTPException(status_code=404, detail="Metrics not found.")

@@ -18,11 +18,10 @@ function fmtDate(iso) {
 const state = { startDate: null, endDate: null };
 
 const FIGURE_CATALOG = [
-    {key: 'LineaA_fig8', label: 'LSTM/GRU multivariate predictions'},
-    {key: 'GB_fig1',     label: 'Gradient Boosting predictions'},
-    {key: 'GB_fig2',     label: 'GB feature importance'},
-    {key: 'LineaA_fig5', label: 'LSTM/GRU univariate predictions'},
-    {key: 'GB_fig3',     label: 'Gradient Boosting residuals'},
+    {key: 'fig_best_models_combined', label: 'Best models — predictions (paper Fig. 4)'},
+    {key: 'LineaA_fig3_ratio_NP',     label: 'N:P molar ratio (paper Fig. 2)'},
+    {key: 'LineaB_fig3_relacion_CQ',  label: 'C-Q relationships (paper Fig. 3)'},
+    {key: 'LineaA_fig1_contribucion', label: 'Cumulative load ranking (supplementary)'},
 ];
 
 // ---------------------------------------------------------------------------
@@ -117,25 +116,29 @@ async function loadSection01() {
     const lr = data.plots.load_ranking;
     const nBars = Math.max(lr.no3.y.length, lr.po4.y.length);
     const chartHeight = Math.max(420, nBars * 38);
+    const maxNO3 = Math.max(...lr.no3.x, 1);
+    const maxPO4 = Math.max(...lr.po4.x, 1);
     const loadLayout = {
         grid: {rows: 1, columns: 2, pattern: 'independent'},
         width: 900,
         height: chartHeight,
         autosize: false,
-        margin: {l: 160, r: 40, t: 40, b: 40},
+        margin: {l: 160, r: 60, t: 40, b: 40},
         showlegend: false,
+        xaxis: {range: [0, maxNO3 * 1.2]},
+        xaxis2: {range: [0, maxPO4 * 1.2]},
     };
     const loadData = [
         {
             type: 'bar', x: lr.no3.x, y: lr.no3.y,
             orientation: 'h', marker: {color: lr.no3.colors},
-            text: lr.no3.pct.map(p => `${p.toFixed(1)}%`), textposition: 'outside',
+            text: lr.no3.pct.map(p => `${p.toFixed(1)}%`), textposition: 'auto',
             name: 'NO₃', xaxis: 'x', yaxis: 'y',
         },
         {
             type: 'bar', x: lr.po4.x, y: lr.po4.y,
             orientation: 'h', marker: {color: lr.po4.colors},
-            text: lr.po4.pct.map(p => `${p.toFixed(1)}%`), textposition: 'outside',
+            text: lr.po4.pct.map(p => `${p.toFixed(1)}%`), textposition: 'auto',
             name: 'PO₄', xaxis: 'x2', yaxis: 'y2',
         },
     ];
@@ -247,36 +250,61 @@ async function loadSection02() {
 }
 
 // ---------------------------------------------------------------------------
-// Forecast (03/04) — static, unchanged
+// Map
+// ---------------------------------------------------------------------------
+async function loadMap() {
+    const el = document.getElementById('study-map');
+    try {
+        const r = await fetch(`${API_BASE}/api/map`);
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        const contentType = r.headers.get('content-type') || '';
+        if (contentType.includes('svg')) {
+            const svgText = await r.text();
+            el.innerHTML = svgText;
+            el.classList.remove('loading');
+        } else {
+            const blob = await r.blob();
+            const url = URL.createObjectURL(blob);
+            el.innerHTML = `<img src="${url}" alt="Study area map" style="max-width:100%;height:auto;border-radius:8px;" onload="URL.revokeObjectURL(this.src)">`;
+            el.classList.remove('loading');
+        }
+    } catch (e) {
+        el.textContent = 'Map not available.';
+        el.classList.remove('loading');
+    }
+}
+
+
+// ---------------------------------------------------------------------------
+// Forecast (03) — static
 // ---------------------------------------------------------------------------
 async function loadForecast() {
     try {
         const data = await fetchJSON(`${API_BASE}/api/results`);
-        renderForecast(data.scripts['03_lstm_gru_forecast'], data.scripts['04_gradient_boosting_benchmark']);
+        renderForecast(data.scripts['03_lstm_gru_forecast']);
     } catch (e) {
         console.error(e);
     }
 }
 
-function renderForecast(lstmRes, gbRes) {
+function renderForecast(lstmRes) {
     const el = document.getElementById('forecast-metrics');
-    const metrics = [];
-    if (lstmRes && lstmRes.metrics) metrics.push(...lstmRes.metrics.map(m => ({...m, family: 'LSTM/GRU'})));
-    if (gbRes && gbRes.metrics) metrics.push(...gbRes.metrics.map(m => ({...m, family: 'Gradient Boosting'})));
-    if (!metrics.length) { el.textContent = 'Data not available.'; return; }
+    if (!lstmRes || !lstmRes.metrics || !lstmRes.metrics.length) {
+        el.textContent = 'Forecast metrics not available.'; return;
+    }
 
     el.innerHTML = `
         <div class="table-wrap">
         <table>
             <thead><tr><th>Model</th><th>MAE</th><th>RMSE</th><th>MAPE (%)</th><th>CVRMSE (%)</th></tr></thead>
             <tbody>
-                ${metrics.map(m => `
+                ${lstmRes.metrics.map(m => `
                     <tr>
-                        <td>${m.Modelo}</td>
+                        <td>${m.Model}</td>
                         <td>${typeof m.MAE === 'number' ? m.MAE.toFixed(3) : m.MAE}</td>
                         <td>${typeof m.RMSE === 'number' ? m.RMSE.toFixed(3) : m.RMSE}</td>
-                        <td>${typeof m['MAPE (%)'] === 'number' ? m['MAPE (%)'].toFixed(1) : m['MAPE (%)']}</td>
-                        <td>${typeof m['CVRMSE (%)'] === 'number' ? m['CVRMSE (%)'].toFixed(1) : m['CVRMSE (%)']}</td>
+                        <td>${typeof m.MAPE === 'number' ? m.MAPE.toFixed(1) : m.MAPE}</td>
+                        <td>${typeof m.CVRMSE === 'number' ? m.CVRMSE.toFixed(1) : m.CVRMSE}</td>
                     </tr>
                 `).join('')}
             </tbody>
@@ -302,7 +330,7 @@ async function loadFigures() {
         // Build selector checkboxes
         const available = new Set(list.figures);
         const checkboxes = FIGURE_CATALOG.map(fig => {
-            const exists = available.has(`${fig.key}.png`) || list.figures.some(f => f.startsWith(fig.key));
+            const exists = list.figures.some(f => f.startsWith(fig.key));
             return `<label class="fig-check" style="${exists ? '' : 'opacity:0.4'}">
                 <input type="checkbox" value="${fig.key}" ${exists ? 'checked' : ''} ${exists ? '' : 'disabled'}>
                 ${fig.label}
@@ -334,10 +362,12 @@ function renderSelectedFigures(allFigures) {
     const html = checked.map(key => {
         const name = allFigures.find(f => f.startsWith(key));
         if (!name) return '';
+        const label = name.replace(/\.(svg|png)$/, '');
+        const imgSrc = `${API_BASE}/api/images/${encodeURIComponent(name)}`;
         return `
             <div class="figure-item">
-                <img src="${API_BASE}/api/images/${encodeURIComponent(name)}" alt="${name}" loading="lazy">
-                <div class="caption">${name.replace('.png','')}</div>
+                <img src="${imgSrc}" alt="${name}" loading="lazy" style="max-width:100%;height:auto;border-radius:6px;">
+                <div class="caption">${label}</div>
             </div>
         `;
     }).join('');
@@ -433,6 +463,7 @@ async function init() {
     document.getElementById('date-start').value = state.startDate;
     document.getElementById('date-end').value = state.endDate;
 
+    await loadMap();
     await loadLatestRecords();
     await loadSection01();
     await loadSection02();

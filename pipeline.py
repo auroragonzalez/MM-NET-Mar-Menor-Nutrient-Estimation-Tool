@@ -2,7 +2,7 @@
 """
 pipeline.py
 
-Orchestrates the 4 paper_results_scripts sequentially and collects their JSON
+Orchestrates the 4 conf_paper_scripts sequentially and collects their JSON
 outputs into a single aggregated results file.
 """
 
@@ -14,17 +14,21 @@ import subprocess
 from pathlib import Path
 from datetime import datetime
 
-_repo_root = Path(__file__).resolve().parent.parent
-DATA_DIR = Path(os.environ.get("NEREIDAS_DATA_DIR", str(_repo_root / "NEREIDAS+")))
-RESULTS_DIR = Path(os.environ.get("RESULTS_OUTPUT_DIR", str(_repo_root / "web_service" / "data")))
-REPO_ROOT = Path(__file__).resolve().parent.parent
+_script_dir = Path(__file__).resolve().parent
+# Look for venv: first inside web_service, then at deployment root
+_VENV_PYTHON = _script_dir / ".venv" / "bin" / "python"
+if not _VENV_PYTHON.exists():
+    _VENV_PYTHON = _script_dir.parent / ".venv" / "bin" / "python"
+if not _VENV_PYTHON.exists():
+    _VENV_PYTHON = None  # fall back to system python
+DATA_DIR = Path(os.environ.get("NEREIDAS_DATA_DIR", str(_script_dir / "data")))
+RESULTS_DIR = Path(os.environ.get("RESULTS_OUTPUT_DIR", str(_script_dir / "data")))
 
-# Scripts to run in order
+# Scripts to run in order (only the 4 best forecasting architectures)
 SCRIPTS = [
-    REPO_ROOT / "paper_results_scripts" / "01_source_apportionment.py",
-    REPO_ROOT / "paper_results_scripts" / "02_hydrological_response.py",
-    REPO_ROOT / "paper_results_scripts" / "03_lstm_gru_forecast.py",
-    REPO_ROOT / "paper_results_scripts" / "04_gradient_boosting_benchmark.py",
+    _script_dir / "conf_paper_scripts" / "01_source_apportionment.py",
+    _script_dir / "conf_paper_scripts" / "02_hydrological_response.py",
+    _script_dir / "conf_paper_scripts" / "03_lstm_gru_forecast.py",
 ]
 
 
@@ -38,12 +42,8 @@ def run_pipeline(force: bool = False) -> dict:
 
     # Build interactive cache (Parquet + JSON sidecars)
     try:
-        import sys
-        _repo = Path(__file__).resolve().parent.parent
-        if str(_repo) not in sys.path:
-            sys.path.insert(0, str(_repo))
-        from web_service.data_store import build_cache, invalidate_memory_cache
-        from web_service.data_store import CACHE_DIR as _CACHE_DIR
+        from data_store import build_cache, invalidate_memory_cache
+        from data_store import CACHE_DIR as _CACHE_DIR
         build_cache(DATA_DIR, _CACHE_DIR)
         invalidate_memory_cache()
         print("[pipeline] Cache built")
@@ -60,14 +60,14 @@ def run_pipeline(force: bool = False) -> dict:
             env = os.environ.copy()
             env["NEREIDAS_DATA_DIR"] = str(DATA_DIR)
             env["RESULTS_OUTPUT_DIR"] = str(RESULTS_DIR)
-            # Ensure python uses the same interpreter
+            python_exe = str(_VENV_PYTHON) if _VENV_PYTHON else sys.executable
             proc = subprocess.run(
-                [sys.executable, str(script)],
+                [python_exe, str(script)],
                 capture_output=True,
                 text=True,
                 timeout=1800,
                 env=env,
-                cwd=str(REPO_ROOT),
+                cwd=str(_script_dir),
             )
             logs.append({"script": script.name, "rc": proc.returncode, "stdout": proc.stdout[-2000:], "stderr": proc.stderr[-1000:]})
             if proc.returncode != 0:
@@ -85,8 +85,11 @@ def run_pipeline(force: bool = False) -> dict:
         "scripts": {},
     }
 
+    scripts_dir = _script_dir / "conf_paper_scripts"
     for script in SCRIPTS:
-        result_file = RESULTS_DIR / f"results_{script.stem.split('_')[0]}.json"
+        # Scripts save results to conf_paper_scripts/ (their own directory)
+        idx = script.stem.split('_')[0]
+        result_file = scripts_dir / f"results_{idx}.json"
         if result_file.exists():
             try:
                 with open(result_file, "r", encoding="utf-8") as f:

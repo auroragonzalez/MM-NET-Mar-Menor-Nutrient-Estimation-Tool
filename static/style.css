@@ -186,6 +186,22 @@ tr:hover { background: #f5f5f5; }
 }
 .fig-check input { cursor: pointer; }
 
+.map-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    border-radius: var(--radius);
+    background: #fafafa;
+}
+.map-container img, .map-container svg {
+    max-width: 100%;
+    height: auto;
+}
+.map-container.loading {
+    min-height: 200px;
+}
+
 footer {
     text-align: center;
     padding: 24px;
