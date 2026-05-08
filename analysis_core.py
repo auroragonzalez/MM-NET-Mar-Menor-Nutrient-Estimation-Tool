@@ -219,16 +219,16 @@ def compute_crosscorr(precip_diaria, caudal_diario, max_lag=30):
 def compute_cq_analysis(df_caudal, df_nutriente, pto_caudal, pto_nutriente, nombre_nutriente):
     """
     C-Q chemostatic analysis: power law C = a * Q^b.
-    Returns regression params and paired scatter arrays for Plotly.
+    Weekly resampling + log-log regression, matching paper Fig. 3.
     """
     if pto_caudal not in df_caudal.columns or pto_nutriente not in df_nutriente.columns:
         return None
-    df_c = df_caudal.loc[~df_caudal.index.duplicated(keep='first')]
-    df_n = df_nutriente.loc[~df_nutriente.index.duplicated(keep='first')]
-    df = pd.DataFrame({
-        'caudal': df_c[pto_caudal],
-        'conc': df_n[pto_nutriente]
-    }).dropna()
+
+    # Weekly resampling (matches paper's 02_hydrological_response.py)
+    w_conc = df_nutriente[pto_nutriente].dropna().resample('W').mean()
+    w_q = df_caudal[pto_caudal].dropna().resample('W').mean()
+
+    df = pd.DataFrame({'caudal': w_q, 'conc': w_conc}).dropna()
     df = df[(df['caudal'] > 0) & (df['conc'] > 0)]
     if len(df) < 10:
         return None
@@ -238,11 +238,11 @@ def compute_cq_analysis(df_caudal, df_nutriente, pto_caudal, pto_nutriente, nomb
     slope, intercept, r_value, p_value, std_err = stats.linregress(log_Q, log_C)
 
     if abs(slope) < 0.05:
-        comp = "CHEMOSTATIC (persistent source, aquifer-like)"
-    elif slope < -0.1:
-        comp = "DILUTION (concentration decreases with flow)"
+        comp = 'Chemostatic (b ≈ 0)'
+    elif slope > 0:
+        comp = 'Mobilization (b > 0)'
     else:
-        comp = "MOBILIZATION (concentration increases with flow)"
+        comp = 'Dilution (b < 0)'
 
     # Generate fitted line points
     q_range = np.logspace(np.log10(df['caudal'].min()), np.log10(df['caudal'].max()), 100)
@@ -255,7 +255,6 @@ def compute_cq_analysis(df_caudal, df_nutriente, pto_caudal, pto_nutriente, nomb
         'p_value': round(float(p_value), 4),
         'std_err': round(float(std_err), 3),
         'behaviour': comp,
-        'behaviour_short': comp.split('(')[0].strip(),
         'n_samples': int(len(df)),
         'scatter': {
             'x': df['caudal'].values.tolist(),

@@ -18,10 +18,13 @@ function fmtDate(iso) {
 const state = { startDate: null, endDate: null };
 
 const FIGURE_CATALOG = [
-    {key: 'fig_best_models_combined', label: 'Best models — predictions (paper Fig. 4)'},
     {key: 'LineaA_fig3_ratio_NP',     label: 'N:P molar ratio (paper Fig. 2)'},
     {key: 'LineaB_fig3_relacion_CQ',  label: 'C-Q relationships (paper Fig. 3)'},
     {key: 'LineaA_fig1_contribucion', label: 'Cumulative load ranking (supplementary)'},
+    {key: 'GB_fig1_predicciones_test', label: 'GB — Test predictions'},
+    {key: 'GB_fig2_univariate_preds', label: 'GB — Univariate predictions'},
+    {key: 'GB_fig3_importancia_features', label: 'GB — Feature importance'},
+    {key: 'GB_fig4_residuos', label: 'GB — Residuals'},
 ];
 
 // ---------------------------------------------------------------------------
@@ -115,7 +118,7 @@ async function loadSection01() {
     // Plotly charts
     const lr = data.plots.load_ranking;
     const nBars = Math.max(lr.no3.y.length, lr.po4.y.length);
-    const chartHeight = Math.max(420, nBars * 38);
+    const chartHeight = Math.max(420, nBars * 55);
     const maxNO3 = Math.max(...lr.no3.x, 1);
     const maxPO4 = Math.max(...lr.po4.x, 1);
     const loadLayout = {
@@ -125,6 +128,7 @@ async function loadSection01() {
         autosize: false,
         margin: {l: 160, r: 60, t: 40, b: 40},
         showlegend: false,
+        bargap: 0.35,
         xaxis: {range: [0, maxNO3 * 1.2]},
         xaxis2: {range: [0, maxPO4 * 1.2]},
     };
@@ -218,33 +222,67 @@ async function loadSection02() {
         title: `Max corr = ${ccPlot.corr_maxima}`};
     Plotly.newPlot('plot-crosscorr', ccData, ccLayout, {responsive: true});
 
-    // C-Q scatter plots
+    // C-Q scatter plots — matching paper Fig. 3
     const cq = data.plots.cq_scatter;
     const cqData = [];
     const cqLayout = {
         grid: {rows: 1, columns: 2, pattern: 'independent'},
-        height: 320, margin: {l: 60, r: 20, t: 50, b: 50},
-        showlegend: true, legend: {y: 1.2, orientation: 'h'},
+        height: 420, margin: {l: 60, r: 20, t: 70, b: 50},
+        showlegend: true, legend: {y: 1.18, orientation: 'h'},
+        title: {
+            text: 'Concentration-Discharge (C-Q) Relationships — Rambla del Albujón',
+            font: {size: 12},
+            y: 0.98,
+        },
     };
     [['no3', cq.no3, 'NO₃ (mg/l)', '#c62828'],
      ['po4', cq.po4, 'PO₄ (mg/l)', '#2e7d32']].forEach(([key, res, label, color], i) => {
         if (!res) return;
         const xaxis = i === 0 ? 'x' : 'x2';
         const yaxis = i === 0 ? 'y' : 'y2';
+        const nutrient = label.split(' ')[0];
+        const subtitle = `C-Q: ${nutrient} | ${res.behaviour}<br>b=${res.slope_b} | R²=${res.r2} | p=${res.p_value}`;
         cqData.push({
             type: 'scatter', mode: 'markers', name: 'Observed',
             x: res.scatter.x, y: res.scatter.y,
-            marker: {size: 5, color: color, opacity: 0.6},
+            marker: {size: 8, color: color, opacity: 0.5},
             xaxis: xaxis, yaxis: yaxis,
         });
         cqData.push({
-            type: 'scatter', mode: 'lines', name: `b=${res.slope_b}, R²=${res.r2}`,
+            type: 'scatter', mode: 'lines', name: `Fit: b=${res.slope_b}, R²=${res.r2}`,
             x: res.fit.x, y: res.fit.y,
-            line: {color: 'black', width: 2},
+            line: {color: 'black', width: 2.5},
             xaxis: xaxis, yaxis: yaxis,
         });
-        cqLayout[`xaxis${i>0 ? i+1 : ''}`] = {title: 'Streamflow Q (l/s) [log]', type: 'log'};
-        cqLayout[`yaxis${i>0 ? i+1 : ''}`] = {title: `${label} [log]`, type: 'log'};
+        cqLayout[`xaxis${i>0 ? i+1 : ''}`] = {
+            title: 'Streamflow Q (L/s) [log]', type: 'log',
+            showgrid: true, gridcolor: 'rgba(0,0,0,0.3)',
+        };
+        cqLayout[`yaxis${i>0 ? i+1 : ''}`] = {
+            title: `${label} [log]`, type: 'log',
+            showgrid: true, gridcolor: 'rgba(0,0,0,0.3)',
+        };
+        cqLayout.annotations = cqLayout.annotations || [];
+        cqLayout.annotations.push({
+            text: subtitle,
+            xref: i === 0 ? 'x domain' : 'x2 domain',
+            yref: i === 0 ? 'y domain' : 'y2 domain',
+            x: 0.5, y: 1.05,
+            xanchor: 'center', yanchor: 'bottom',
+            showarrow: false,
+            font: {size: 11, color: '#333'},
+        });
+        cqLayout.annotations.push({
+            text: `n = ${res.n_samples} samples`,
+            xref: i === 0 ? 'x domain' : 'x2 domain',
+            yref: i === 0 ? 'y domain' : 'y2 domain',
+            x: 0.02, y: 0.02,
+            xanchor: 'left', yanchor: 'bottom',
+            showarrow: false,
+            font: {size: 9, color: '#333'},
+            bgcolor: 'rgba(255,255,255,0.8)',
+            borderpad: 4,
+        });
     });
     Plotly.newPlot('plot-cq', cqData, cqLayout, {responsive: true});
 }
@@ -276,12 +314,13 @@ async function loadMap() {
 
 
 // ---------------------------------------------------------------------------
-// Forecast (03) — static
+// Forecast (03) + GB Benchmark (04) — static
 // ---------------------------------------------------------------------------
 async function loadForecast() {
     try {
         const data = await fetchJSON(`${API_BASE}/api/results`);
         renderForecast(data.scripts['03_lstm_gru_forecast']);
+        renderForecastPlot(data.scripts['03_lstm_gru_forecast']);
     } catch (e) {
         console.error(e);
     }
@@ -313,6 +352,88 @@ function renderForecast(lstmRes) {
     `;
 }
 
+function renderForecastPlot(lstmRes) {
+    if (!lstmRes || !lstmRes.predictions || !lstmRes.predictions.length) return;
+
+    const preds = lstmRes.predictions;
+    const CO = '#1565c0';  // observed blue
+    const CP = '#c62828';  // predicted red
+    const plotData = [];
+    const annotations = [];
+
+    preds.forEach((p, i) => {
+        const row = Math.floor(i / 2) + 1;
+        const col = (i % 2) + 1;
+        const xaxis = `x${i + 1}`;
+        const yaxis = `y${i + 1}`;
+
+        plotData.push({
+            type: 'scatter', mode: 'lines+markers', name: 'Observed',
+            x: p.idx, y: p.y_true,
+            line: {color: CO, width: 1.2},
+            marker: {size: 3, color: CO},
+            xaxis: xaxis, yaxis: yaxis, legendgroup: i === 0 ? 'obs' : null,
+            showlegend: i === 0,
+        });
+        plotData.push({
+            type: 'scatter', mode: 'lines+markers', name: 'Predicted',
+            x: p.idx, y: p.y_pred,
+            line: {color: CP, width: 1.2, dash: 'dash'},
+            marker: {size: 3, color: CP, symbol: 'square'},
+            xaxis: xaxis, yaxis: yaxis, legendgroup: i === 0 ? 'pred' : null,
+            showlegend: i === 0,
+        });
+
+        annotations.push({
+            text: `MAE = ${p.MAE} mg/l<br>RMSE = ${p.RMSE} mg/l<br>CVRMSE = ${p.CVRMSE}%`,
+            x: 0.03, y: 0.96, xref: `${xaxis} domain`, yref: `${yaxis} domain`,
+            xanchor: 'left', yanchor: 'top',
+            showarrow: false, font: {size: 8, color: '#333'},
+            bgcolor: 'rgba(255,255,255,0.85)',
+            borderpad: 4,
+        });
+        annotations.push({
+            text: `(${p.panel})`,
+            x: 0.02, y: 0.88, xref: `${xaxis} domain`, yref: `${yaxis} domain`,
+            xanchor: 'left', yanchor: 'top',
+            showarrow: false, font: {size: 11, color: '#333'},
+            bgcolor: 'rgba(255,255,255,0.7)',
+            borderpad: 4,
+        });
+    });
+
+    const layout = {
+        grid: {rows: 2, columns: 2, pattern: 'independent'},
+        height: 650,
+        margin: {l: 60, r: 20, t: 30, b: 50},
+        showlegend: true,
+        legend: {y: 1.08, orientation: 'h', x: 0.3},
+        annotations: annotations,
+    };
+
+    preds.forEach((p, i) => {
+        const xaxis = `xaxis${i + 1}`;
+        const yaxis = `yaxis${i + 1}`;
+        layout[xaxis] = {title: ''};
+        layout[yaxis] = {title: p.ylabel};
+        layout[`xaxis${i > 0 ? i + 1 : ''}`] = layout[xaxis];
+        layout[`yaxis${i > 0 ? i + 1 : ''}`] = layout[yaxis];
+    });
+
+    // Per-panel titles
+    preds.forEach((p, i) => {
+        annotations.push({
+            text: p.title,
+            x: 0.5, y: 1.0, xref: `x${i + 1} domain`, yref: `y${i + 1} domain`,
+            xanchor: 'center', yanchor: 'bottom',
+            showarrow: false, font: {size: 11, color: '#333'},
+        });
+    });
+
+    Plotly.newPlot('plot-forecast', plotData, layout, {responsive: true});
+}
+
+// ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // Figures — curated gallery with selector
 // ---------------------------------------------------------------------------
@@ -408,24 +529,6 @@ document.getElementById('btn-reset-range').addEventListener('click', async () =>
     document.getElementById('date-end').value = state.endDate;
     await loadSection01();
     await loadSection02();
-});
-
-document.getElementById('btn-download-metrics').addEventListener('click', async () => {
-    try {
-        const r = await fetch(`${API_BASE}/api/download/metrics`);
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        const blob = await r.blob();
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'forecast_metrics.json';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
-    } catch (e) {
-        alert('Error downloading metrics.');
-    }
 });
 
 document.getElementById('btn-download-figures').addEventListener('click', async () => {

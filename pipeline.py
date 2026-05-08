@@ -24,11 +24,13 @@ if not _VENV_PYTHON.exists():
 DATA_DIR = Path(os.environ.get("NEREIDAS_DATA_DIR", str(_script_dir / "data")))
 RESULTS_DIR = Path(os.environ.get("RESULTS_OUTPUT_DIR", str(_script_dir / "data")))
 
+SCRIPTS_DIR = _script_dir / "MM-NET-Mar-Menor-Nutrient-Estimation-AI4NATURE"
+
 # Scripts to run in order (only the 4 best forecasting architectures)
 SCRIPTS = [
-    _script_dir / "conf_paper_scripts" / "01_source_apportionment.py",
-    _script_dir / "conf_paper_scripts" / "02_hydrological_response.py",
-    _script_dir / "conf_paper_scripts" / "03_lstm_gru_forecast.py",
+    SCRIPTS_DIR / "01_source_apportionment.py",
+    SCRIPTS_DIR / "02_hydrological_response.py",
+    SCRIPTS_DIR / "03_lstm_gru_forecast.py",
 ]
 
 
@@ -85,11 +87,10 @@ def run_pipeline(force: bool = False) -> dict:
         "scripts": {},
     }
 
-    scripts_dir = _script_dir / "conf_paper_scripts"
     for script in SCRIPTS:
-        # Scripts save results to conf_paper_scripts/ (their own directory)
+        # Scripts save results to their own directory (MM-NET-Mar-Menor-Nutrient-Estimation-AI4NATURE)
         idx = script.stem.split('_')[0]
-        result_file = scripts_dir / f"results_{idx}.json"
+        result_file = SCRIPTS_DIR / f"results_{idx}.json"
         if result_file.exists():
             try:
                 with open(result_file, "r", encoding="utf-8") as f:

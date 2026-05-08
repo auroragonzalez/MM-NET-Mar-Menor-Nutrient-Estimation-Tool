@@ -1,0 +1,69 @@
+{
+  "script": "03_lstm_gru_forecast",
+  "timestamp": "2026-05-04T13:35:52.581558",
+  "config": {
+    "lookback": 8,
+    "epochs": 250,
+    "batch": 16,
+    "patience": 30,
+    "n_seeds": 3
+  },
+  "metrics": [
+    {
+      "Model": "LSTM-NO3-uni",
+      "MAE": 14.791,
+      "RMSE": 17.467,
+      "MAPE": 15.0,
+      "CVRMSE": 16.5
+    },
+    {
+      "Model": "GRU-NO3-uni",
+      "MAE": 14.002,
+      "RMSE": 16.898,
+      "MAPE": 14.1,
+      "CVRMSE": 15.9
+    },
+    {
+      "Model": "LSTM-NO3-mv",
+      "MAE": 12.877,
+      "RMSE": 17.075,
+      "MAPE": 14.3,
+      "CVRMSE": 16.8
+    },
+    {
+      "Model": "GRU-NO3-mv",
+      "MAE": 12.503,
+      "RMSE": 16.627,
+      "MAPE": 13.6,
+      "CVRMSE": 16.3
+    },
+    {
+      "Model": "LSTM-PO4-uni",
+      "MAE": 0.213,
+      "RMSE": 0.295,
+      "MAPE": 22.0,
+      "CVRMSE": 35.8
+    },
+    {
+      "Model": "GRU-PO4-uni",
+      "MAE": 0.22,
+      "RMSE": 0.285,
+      "MAPE": 26.0,
+      "CVRMSE": 34.6
+    },
+    {
+      "Model": "LSTM-PO4-mv",
+      "MAE": 0.162,
+      "RMSE": 0.214,
+      "MAPE": 19.9,
+      "CVRMSE": 28.0
+    },
+    {
+      "Model": "GRU-PO4-mv",
+      "MAE": 0.167,
+      "RMSE": 0.222,
+      "MAPE": 21.6,
+      "CVRMSE": 29.1
+    }
+  ]
+}

@@ -3,7 +3,7 @@
 # Everything (code, data, venv) lives inside the web_service/ directory.
 set -e
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "${SCRIPT_DIR}"
 
 # ── Data directory (inside web_service/) ────────────────────────────────────
@@ -27,7 +27,7 @@ if [ ! -f "${VENV_DIR}/bin/activate" ]; then
 fi
 
 echo "Activating venv ..."
-source "${VENV_DIR}/bin/activate"
+. "${VENV_DIR}/bin/activate"
 
 # ── Launch ──────────────────────────────────────────────────────────────────
 echo "Starting uvicorn on http://0.0.0.0:8000 ..."

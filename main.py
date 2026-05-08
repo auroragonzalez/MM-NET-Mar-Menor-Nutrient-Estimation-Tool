@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-main.py — FastAPI application for the NEREIDAS+ real-time dashboard.
+main.py — FastAPI application for the MMNET real-time dashboard.
 """
 
 import os
@@ -138,7 +138,7 @@ def api_image(image_name: str):
         raise HTTPException(status_code=400, detail="Image name not allowed")
     # Search in multiple directories
     search_dirs = [
-        _script_dir / "conf_paper_scripts",
+        _script_dir / "MM-NET-Mar-Menor-Nutrient-Estimation-AI4NATURE",
         RESULTS_DIR,
     ]
     for d in search_dirs:
@@ -166,6 +166,7 @@ def api_trigger(background_tasks: BackgroundTasks, force: bool = False):
 def api_map():
     """Serve the study area map figure."""
     map_paths = [
+        _script_dir / "figs" / "mmnetaoi.png",
         _script_dir / "figs" / "map2.svg",
         _script_dir / "figs" / "mapa_muestreo_mar_menor.png",
     ]
@@ -180,7 +181,7 @@ def api_map():
 def api_figures():
     """List available figures in the results directory."""
     results_figs = []
-    script_outputs = _script_dir / "conf_paper_scripts"
+    script_outputs = _script_dir / "MM-NET-Mar-Menor-Nutrient-Estimation-AI4NATURE"
     for d in [RESULTS_DIR, script_outputs]:
         if d.exists():
             for ext in ['*.svg', '*.png']:
@@ -254,7 +255,7 @@ def api_section_02(
     df_fosfatos = get_cached_df("fosfatos", CACHE_DIR)
     df_caudal_xlsx = get_cached_df("caudal", CACHE_DIR)
 
-    caudal_s = caudal_df.iloc[:, 0] if caudal_df.shape[1] == 1 else caudal_df["caudal_m3s"]
+    caudal_s = caudal_df.iloc[:, 0] if caudal_df.shape[1] == 1 else caudal_df["caudal_l_s"]
     precip_s = precip_df.iloc[:, 0] if precip_df.shape[1] == 1 else precip_df["precip_mm"]
 
     if start_date and end_date:
@@ -354,7 +355,7 @@ def api_latest_records():
 @app.get("/api/download/figures")
 def api_download_figures():
     results_figs = []
-    script_outputs = _script_dir / "conf_paper_scripts"
+    script_outputs = _script_dir / "MM-NET-Mar-Menor-Nutrient-Estimation-AI4NATURE"
     for d in [RESULTS_DIR, script_outputs]:
         if d.exists():
             for ext in ['*.svg', '*.png']:
@@ -380,12 +381,12 @@ def api_download_metrics():
     with open(MASTER_JSON, "r", encoding="utf-8") as f:
         data = json.load(f)
     rows = []
-    for script_key in ["03_lstm_gru_forecast"]:
+    for script_key in ["03_lstm_gru_forecast", "04_gradient_boosting_benchmark"]:
         script_data = data.get("scripts", {}).get(script_key, {})
         metrics = script_data.get("metrics", [])
         for m in metrics:
             rows.append({
-                "family": "LSTM/GRU",
+                "family": "LSTM/GRU" if "lstm" in script_key else "Gradient Boosting",
                 "model": m.get("Model", m.get("Modelo", "")),
                 "MAE": m.get("MAE", ""),
                 "RMSE": m.get("RMSE", ""),

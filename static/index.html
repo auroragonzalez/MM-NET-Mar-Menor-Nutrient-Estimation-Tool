@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spatio-Temporal Characterization of Nutrient Loading in an Ephemeral Mediterranean Catchment</title>
+    <title>Spatio-Temporal Characterization of Nutrient Loading in Mar Menor Using Multi-Source Monitoring and Forecasting</title>
     <link rel="stylesheet" href="/static/style.css">
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js" defer></script>
 </head>
@@ -18,7 +18,7 @@
 
     <main class="container">
         <section class="hero">
-            <h1>Spatio-Temporal Characterization of Nutrient Loading in an Ephemeral Mediterranean Catchment Using Multi-Source Monitoring and Recurrent Neural Network Forecasting</h1>
+            <h1>Spatio-Temporal Characterization of Nutrient Loading in Mar Menor Using Multi-Source Monitoring and Forecasting</h1>
             <p class="subtitle">Real-time results for the <em>AI4Nature@AVSS2026</em> paper. Data are automatically updated from the <a href="https://canalmarmenor.carm.es/" target="_blank">Canal Mar Menor</a>.</p>
         </section>
 
@@ -42,7 +42,7 @@
 
         <div class="grid">
             <div class="card wide">
-                <h2>Latest Records</h2>
+                <h2>Latest Records on Albujón Catchment</h2>
                 <div id="latest-records" class="loading">Loading...</div>
             </div>
 
@@ -69,11 +69,19 @@
             </div>
 
             <div class="card wide">
-                <h2>Forecasting — Test Metrics (Best Models)</h2>
+                <h2>Forecasting — LSTM/GRU Test Predictions (Best Models)</h2>
                 <div id="forecast-metrics" class="loading">Loading...</div>
-                <div style="margin-top:12px; text-align:right;">
-                    <button id="btn-download-metrics" class="btn primary">Download metrics (CSV)</button>
-                </div>
+                <div id="plot-forecast" class="plotly-chart" style="margin-top:16px"></div>
+            </div>
+
+            <div class="card wide">
+                <h2>Data Sources</h2>
+                <ul style="line-height:1.6; color:#444;">
+                    <li><strong><a href="https://canalmarmenor.carm.es/monitorizacion/monitorizacion-de-parametros/aforos/" target="_blank">Ramblas MARMENOR (IMIDA/DGMM):</a></strong> Weekly grab samples of NO<sub>3</sub> and PO<sub>4</sub> concentration at 23 control points (14 after eliminating those with less than 5 measurements), together with weekly streamflow estimates, spanning August 2019 to March 2026.</li>
+                    <li><strong><a href="https://saihweb.chsegura.es/apps/iVisor/index.php" target="_blank">SAIH–CHS:</a></strong> 5-minute resolution records of streamflow (<i>Q</i>), precipitation, and water level at 12 gauging and pluviometric stations throughout the catchment from 2016–present.</li>
+                    <li><strong><a href="https://www.aemet.es/es/datos_abiertos/AEMET_OpenData" target="_blank">AEMET:</a></strong> Hourly meteorological data from four terrestrial stations (Cartagena, Fuente Álamo, San Javier, Torre Pacheco), covering 2023–2025.</li>
+                    <li><strong><a href="http://siam.imida.es/" target="_blank">SIAM:</a></strong> Daily agro-meteorological records from five stations (CA12, CA73, TP22, TP42, TP91) with continuous coverage from 2016 to 2026, used to extend the precipitation record beyond the AEMET window.</li>
+                </ul>
             </div>
 
             <div class="card wide">
@@ -88,7 +96,7 @@
     </main>
 
     <footer>
-        <p>NEREIDAS+ / OMM-Azul — Universidad Politécnica de Cartagena &amp; IMIDA</p>
+        <p>Mar Menor Nutrient Estimation Tool - DIIC, Universidad de Murcia</p>
     </footer>
 
     <script src="/static/app.js"></script>

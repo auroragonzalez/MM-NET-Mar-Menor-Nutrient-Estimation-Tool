@@ -40,24 +40,51 @@ def _leer_hoja_excel(path, hoja):
     return datos.dropna(axis=1, how='all'), id_nombre
 
 
-def _load_saih_streamflow(fpath):
-    """Load Albujón streamflow and resample to daily mean."""
-    try:
-        df = pd.read_csv(fpath, sep=';', header=5)
-        df.columns = df.columns.str.strip()
-        df['datetime'] = pd.to_datetime(
-            df['Date'].astype(str) + ' ' + df['Time'].astype(str), errors='coerce')
-        df = df.dropna(subset=['datetime']).set_index('datetime')
-        val_col = [c for c in df.columns if 'streamflow' in c.lower() or 'caudal' in c.lower()]
-        if not val_col:
-            val_col = [c for c in df.columns if c not in ['Date', 'Time']]
-        if not val_col:
-            return pd.Series(dtype=float, name='caudal_m3s')
-        s = pd.to_numeric(df[val_col[0]], errors='coerce')
-        return s.resample('D').mean().rename('caudal_m3s')
-    except Exception as e:
-        print(f"  ⚠ Error SAIH {fpath}: {e}")
-        return pd.Series(dtype=float, name='caudal_m3s')
+def _load_saih_caudal(ramblas_dir):
+    """Load Albujón streamflow from Caudal.parquet + Caudal.csv (2021–2026), matching paper."""
+    albujon = ramblas_dir / "06A18-Desembocadura Rambla Albujon"
+    dfs = []
+
+    # Parquet (2021-01 → 2026-04, 5-min)
+    pq_path = albujon / "06A18Q01-Caudal.parquet"
+    if pq_path.exists():
+        df_pq = pd.read_parquet(pq_path)
+        df_pq['datetime'] = pd.to_datetime(df_pq['Date'])
+        df_pq['caudal_l_s'] = pd.to_numeric(df_pq['Caudal'], errors='coerce')
+        dfs.append(df_pq[['datetime', 'caudal_l_s']])
+
+    # CSV (2026-04 → 2026-05, 5-min, extends parquet)
+    csv_path = albujon / "06A18Q01-Caudal.csv"
+    if csv_path.exists():
+        df_csv = pd.read_csv(csv_path)
+        df_csv['datetime'] = pd.to_datetime(df_csv['Date'])
+        df_csv['caudal_l_s'] = pd.to_numeric(df_csv['Caudal'], errors='coerce')
+        dfs.append(df_csv[['datetime', 'caudal_l_s']])
+
+    if not dfs:
+        # Fallback: try legacy Streamflow.csv
+        sf_path = albujon / "06A18Q01-Streamflow.csv"
+        if sf_path.exists():
+            try:
+                df = pd.read_csv(sf_path, sep=';', header=5)
+                df.columns = df.columns.str.strip()
+                df['datetime'] = pd.to_datetime(
+                    df['Date'].astype(str) + ' ' + df['Time'].astype(str), errors='coerce')
+                df = df.dropna(subset=['datetime']).set_index('datetime')
+                val_col = [c for c in df.columns if 'streamflow' in c.lower() or 'caudal' in c.lower()]
+                if not val_col:
+                    val_col = [c for c in df.columns if c not in ['Date', 'Time']]
+                if val_col:
+                    s = pd.to_numeric(df[val_col[0]], errors='coerce')
+                    return s.resample('D').mean().rename('caudal_l_s')
+            except Exception as e:
+                print(f"  ⚠ Error SAIH fallback {sf_path}: {e}")
+        return pd.Series(dtype=float, name='caudal_l_s')
+
+    df_all = pd.concat(dfs).dropna(subset=['datetime'])
+    df_all = df_all.set_index('datetime').sort_index()
+    df_all = df_all[~df_all.index.duplicated(keep='first')]
+    return df_all['caudal_l_s'].resample('D').mean()
 
 
 def _load_siam_precip(siam_dir):
@@ -129,15 +156,14 @@ def build_cache(data_dir=None, cache_dir=None):
     with open(cache_dir / "id_nombre_f.json", "w", encoding="utf-8") as f:
         json.dump(id_nombre_f, f, ensure_ascii=False, indent=2)
 
-    # SAIH streamflow
+    # SAIH streamflow from Caudal.parquet + Caudal.csv (matches paper)
     ramblas_dir = data_dir / "SAIH_Ramblas_clean"
-    caudal_path = ramblas_dir / "06A18-Desembocadura Rambla Albujon" / "06A18Q01-Streamflow.csv"
-    if caudal_path.exists():
-        s_caudal = _load_saih_streamflow(caudal_path)
+    s_caudal = _load_saih_caudal(ramblas_dir)
+    if s_caudal.dropna().shape[0] > 0:
         s_caudal.to_frame().to_parquet(cache_dir / "saih_caudal.parquet")
-        print(f"[cache] saih_caudal: {s_caudal.shape[0]} days")
+        print(f"[cache] saih_caudal: {s_caudal.dropna().shape[0]} days")
     else:
-        print(f"[cache] WARNING: SAIH caudal not found at {caudal_path}")
+        print(f"[cache] WARNING: SAIH caudal not found")
 
     # SIAM precipitation
     siam_dir = data_dir / "SIAM"

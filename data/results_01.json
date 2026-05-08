@@ -1,6 +1,10 @@
 {
   "script": "01_source_apportionment",
-  "timestamp": "2026-04-30T04:20:05.678118",
+  "timestamp": "2026-05-04T13:36:37.273184",
+  "loads": {
+    "no3_global_tonnes": 2079.8,
+    "po4_global_tonnes": 11.5
+  },
   "totales_no3_top5": [
     {
       "pto": "2",

@@ -1,0 +1,148 @@
+{
+  "script": "04_gradient_boosting_benchmark",
+  "timestamp": "2026-05-04T12:15:34.184954",
+  "metrics": [
+    {
+      "Modelo": "LGBM-MV-NO3",
+      "MAE": 20.691,
+      "RMSE": 24.572,
+      "MAPE (%)": 22.206,
+      "CVRMSE (%)": 24.133
+    },
+    {
+      "Modelo": "XGB-MV-NO3",
+      "MAE": 19.596,
+      "RMSE": 23.57,
+      "MAPE (%)": 21.209,
+      "CVRMSE (%)": 23.149
+    },
+    {
+      "Modelo": "LGBM-MV-PO4",
+      "MAE": 0.168,
+      "RMSE": 0.231,
+      "MAPE (%)": 20.209,
+      "CVRMSE (%)": 30.201
+    },
+    {
+      "Modelo": "XGB-MV-PO4",
+      "MAE": 0.178,
+      "RMSE": 0.257,
+      "MAPE (%)": 21.039,
+      "CVRMSE (%)": 33.513
+    },
+    {
+      "Modelo": "LGBM-U-NO3",
+      "MAE": 19.564,
+      "RMSE": 23.37,
+      "MAPE (%)": 20.861,
+      "CVRMSE (%)": 22.035
+    },
+    {
+      "Modelo": "XGB-U-NO3",
+      "MAE": 17.283,
+      "RMSE": 21.767,
+      "MAPE (%)": 18.447,
+      "CVRMSE (%)": 20.523
+    },
+    {
+      "Modelo": "LGBM-U-PO4",
+      "MAE": 0.241,
+      "RMSE": 0.323,
+      "MAPE (%)": 28.992,
+      "CVRMSE (%)": 39.216
+    },
+    {
+      "Modelo": "XGB-U-PO4",
+      "MAE": 0.246,
+      "RMSE": 0.32,
+      "MAPE (%)": 29.198,
+      "CVRMSE (%)": 38.831
+    }
+  ],
+  "feature_importance": {
+    "no3_top10": [
+      {
+        "Feature": "NO3_lag1",
+        "Importance": 281
+      },
+      {
+        "Feature": "caudal",
+        "Importance": 245
+      },
+      {
+        "Feature": "caudal_lag1",
+        "Importance": 210
+      },
+      {
+        "Feature": "NO3_lag4",
+        "Importance": 174
+      },
+      {
+        "Feature": "NO3_lag2",
+        "Importance": 164
+      },
+      {
+        "Feature": "precip",
+        "Importance": 155
+      },
+      {
+        "Feature": "NO3_lag6",
+        "Importance": 153
+      },
+      {
+        "Feature": "week_cos",
+        "Importance": 149
+      },
+      {
+        "Feature": "NO3_lag7",
+        "Importance": 143
+      },
+      {
+        "Feature": "precip_lag2",
+        "Importance": 132
+      }
+    ],
+    "po4_top10": [
+      {
+        "Feature": "week_sin",
+        "Importance": 188
+      },
+      {
+        "Feature": "precip_lag1",
+        "Importance": 180
+      },
+      {
+        "Feature": "caudal_lag1",
+        "Importance": 175
+      },
+      {
+        "Feature": "caudal",
+        "Importance": 174
+      },
+      {
+        "Feature": "precip",
+        "Importance": 155
+      },
+      {
+        "Feature": "PO4_lag1",
+        "Importance": 155
+      },
+      {
+        "Feature": "caudal_roll_mean",
+        "Importance": 122
+      },
+      {
+        "Feature": "precip_lag2",
+        "Importance": 121
+      },
+      {
+        "Feature": "PO4_lag2",
+        "Importance": 121
+      },
+      {
+        "Feature": "PO4_lag5",
+        "Importance": 119
+      }
+    ]
+  }
+}
