@@ -3,7 +3,7 @@ uvicorn[standard]==0.32.0
 apscheduler==3.10.4
 requests==2.32.3
 beautifulsoup4==4.12.3
-pandas==2.2.2
+pandas>=2.2.3
 numpy==1.26.4
 matplotlib==3.9.0
 scipy==1.14.0
